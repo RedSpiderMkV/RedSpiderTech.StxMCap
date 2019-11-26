@@ -1,15 +1,23 @@
 ﻿using System;
 using System.Net;
 using Newtonsoft.Json.Linq;
+using StxMCap.DataGrabber.Factory;
+using StxMCap.DataGrabber.Model;
 
 namespace StxMCap.DataGrabber
 {
     class Program
     {
+        private static IMarketDataFactory _marketDataFactory;
+
         static void Main(string[] args)
         {
+            _marketDataFactory = new MarketDataFactory();
+
             string[] symbols = { "MSFT", "BABA", "AMZN", "GOOG" };
-            Console.WriteLine("Symbol\tMarketCap\tCurrentPrice");
+            string header = string.Format("{0,-10} {1,-10} {2,-10}", "Symbol", "MarketCap", "CurrentPrice");
+            Console.WriteLine(header);
+            Console.WriteLine("".PadLeft(header.Length, '-'));
 
             foreach (string symbol in symbols)
             {
@@ -36,20 +44,8 @@ namespace StxMCap.DataGrabber
             }
 
             string jsonContent = jsonContentHolder.Remove(jsonContentHolder.Length - 1);
-
-            var jsonObject = JObject.Parse(jsonContent);
-            var dataObject = jsonObject["context"]["dispatcher"]["stores"]["StreamDataStore"]["quoteData"][symbol];
-
-            string symbol_value = dataObject["symbol"].Value<string>();
-            string timestamp = dataObject["regularMarketTime"]["fmt"].Value<string>();
-            string longName = dataObject.Value<string>("longName");
-            string shortName = dataObject.Value<string>("shortName");
-            string exchangeName = dataObject.Value<string>("fullExchangeName");
-            string marketCapital = dataObject["marketCap"]["raw"].Value<string>();
-            string current_price = dataObject["regularMarketPrice"]["raw"].Value<string>();
-            double marketCapitalValue = double.Parse(marketCapital) / (1*Math.Pow(10,9));
-
-            Console.WriteLine($"{symbol_value}\t{marketCapitalValue:F4}\t{current_price}");
+            IMarketData marketData = _marketDataFactory.GetMarketDataFromJson(jsonContent, symbol);
+            Console.WriteLine(marketData);
         }
     }
 }
