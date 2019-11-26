@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Net;
-using Newtonsoft.Json.Linq;
+using StxMCap.DataGrabber.ApiManagement;
 using StxMCap.DataGrabber.Factory;
 using StxMCap.DataGrabber.Model;
 
@@ -9,10 +8,14 @@ namespace StxMCap.DataGrabber
     class Program
     {
         private static IMarketDataFactory _marketDataFactory;
+        private static IApiManager _apiManager;
+        private static IWebClientWrapperFactory _webClientWrapperFactory;
 
         static void Main(string[] args)
         {
             _marketDataFactory = new MarketDataFactory();
+            _webClientWrapperFactory = new WebClientWrapperFactory();
+            _apiManager = new ApiManager(_webClientWrapperFactory);
 
             string[] symbols = { "MSFT", "BABA", "AMZN", "GOOG" };
             string header = string.Format("{0,-10} {1,-10} {2,-10}", "Symbol", "MarketCap", "CurrentPrice");
@@ -27,24 +30,9 @@ namespace StxMCap.DataGrabber
 
         private static void DisplayMarketData(string symbol)
         {
-            string url = $"https://uk.finance.yahoo.com/quote/{symbol}?p={symbol}";
-
-            var webClient = new WebClient();
-            string pageContent = webClient.DownloadString(url);
-            string[] pageContentLines = pageContent.Split('\n');
-
-            string jsonContentHolder = null;
-            foreach (string line in pageContentLines)
-            {
-                if (line.StartsWith("root.App.main"))
-                {
-                    jsonContentHolder = line.Split(new string[] { "root.App.main = " }, StringSplitOptions.None)[1];
-                    break;
-                }
-            }
-
-            string jsonContent = jsonContentHolder.Remove(jsonContentHolder.Length - 1);
+            string jsonContent = _apiManager.GetJsonData(symbol);
             IMarketData marketData = _marketDataFactory.GetMarketDataFromJson(jsonContent, symbol);
+
             Console.WriteLine(marketData);
         }
     }
