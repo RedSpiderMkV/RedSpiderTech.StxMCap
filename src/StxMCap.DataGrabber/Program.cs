@@ -1,8 +1,7 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Autofac;
 using Serilog;
-using Serilog.Events;
 using StxMCap.DataGrabber.ApiManagement;
 using StxMCap.DataGrabber.Factory;
 using StxMCap.DataGrabber.FileManagement;
@@ -21,43 +20,32 @@ namespace StxMCap.DataGrabber
             InitialiseContainer();
 
             var appConfigurationManager = _container.Resolve<IAppConfigurationManager>();
+            _logger = _container.Resolve<ILogger>();
 
-            string logFile = appConfigurationManager.LogFile;
-
-            Log.Logger = new LoggerConfiguration()
-                .WriteTo.Console(LogEventLevel.Verbose)
-                .WriteTo.File(logFile, rollingInterval: RollingInterval.Day, restrictedToMinimumLevel: LogEventLevel.Verbose)
-                .CreateLogger();
-
-            _logger = Log.Logger;
-
-            string header = string.Format("{0,-10} {1,-10} {2,-10}", "Symbol", "MarketCap", "CurrentPrice");
-            Console.WriteLine(header);
-            Console.WriteLine("".PadLeft(header.Length, '-'));
+            _logger.Information("RedSpiderTech.StxMCap - Data Retrieval");
+            _logger.Information("--------------------------------------");
 
             var inputFileParser = _container.Resolve<IInputFileParser>();
+            var marketDataRetriever = _container.Resolve<IMarketDataRetriever>();
+            var outputDataWriter = _container.Resolve<IOutputDataWriter>();
+
             string[] symbols = inputFileParser.GetInputSymbols();
+            IEnumerable<IMarketData> marketDataCollection = symbols.Select(marketDataRetriever.GetMarketData);
+            marketDataCollection.ToList().ForEach(outputDataWriter.AppendData);
 
-            symbols.ToList().ForEach(DisplayMarketData);
-        }
-
-        private static void DisplayMarketData(string symbol)
-        {
-            var apiManager = _container.Resolve<IApiManager>();
-            var marketDataFactory = _container.Resolve<IMarketDataFactory>();
-
-            string jsonContent = apiManager.GetJsonData(symbol);
-            IMarketData marketData = marketDataFactory.GetMarketDataFromJson(jsonContent, symbol);
-
-            Console.WriteLine(marketData);
+            outputDataWriter.Dispose();
         }
 
         private static void InitialiseContainer()
         {
             var builder = new ContainerBuilder();
 
+            builder.RegisterType<LogInitialiser>().As<ILogInitialiser>().SingleInstance();
+            builder.Register(x => x.Resolve<ILogInitialiser>().GetLogger()).As<ILogger>().SingleInstance();
             builder.RegisterType<MarketDataFactory>().As<IMarketDataFactory>().SingleInstance();
             builder.RegisterType<ApiManager>().As<IApiManager>().SingleInstance();
+            builder.RegisterType<MarketDataRetriever>().As<IMarketDataRetriever>().SingleInstance();
+            builder.RegisterType<OutputDataWriter>().As<IOutputDataWriter>().SingleInstance();
             builder.RegisterType<WebClientWrapperFactory>().As<IWebClientWrapperFactory>();
             builder.RegisterType<AppConfigurationManager>().As<IAppConfigurationManager>();
             builder.RegisterType<InputFileParser>().As<IInputFileParser>();

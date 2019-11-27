@@ -1,10 +1,7 @@
-﻿using StxMCap.DataGrabber.Factory;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using Serilog;
+using StxMCap.DataGrabber.Factory;
+using StxMCap.DataGrabber.Wrapper;
 
 namespace StxMCap.DataGrabber.ApiManagement
 {
@@ -14,21 +11,30 @@ namespace StxMCap.DataGrabber.ApiManagement
 
         private const string API_URL_TEMPLATE = "https://uk.finance.yahoo.com/quote/{0}?p={0}";
         private readonly IWebClientWrapperFactory _webClientWrapperFactory;
+        private readonly ILogger _logger;
 
         #endregion
 
         #region Public Methods
 
-        public ApiManager(IWebClientWrapperFactory webClientWrapperFactory)
+        public ApiManager(ILogger logger, IWebClientWrapperFactory webClientWrapperFactory)
         {
             _webClientWrapperFactory = webClientWrapperFactory;
+            _logger = logger;
+
+            _logger.Information("ApiManager: Instantiation successful.");
         }
 
         public string GetJsonData(string symbol)
         {
-            string url = string.Format(API_URL_TEMPLATE, symbol);
+            _logger.Information($"ApiManager: Retrieving json data for symbol: {symbol}");
 
-            var webClient = _webClientWrapperFactory.GetNewWebClientWrapper();
+            string url = string.Format(API_URL_TEMPLATE, symbol);
+            _logger.Information($"ApiManager: Data URL link: {url}");
+
+            IWebClientWrapper webClient = _webClientWrapperFactory.GetNewWebClientWrapper();
+
+            _logger.Information("ApiManager: Retrieving data from URL link.");
             string pageContent = webClient.DownloadString(url);
             string[] pageContentLines = pageContent.Split('\n');
 
@@ -37,6 +43,7 @@ namespace StxMCap.DataGrabber.ApiManagement
             {
                 if (line.StartsWith("root.App.main"))
                 {
+                    _logger.Information("ApiManager: root node identified, extracting relevant json data.");
                     jsonContentHolder = line.Split(new string[] { "root.App.main = " }, StringSplitOptions.None)[1];
                     break;
                 }

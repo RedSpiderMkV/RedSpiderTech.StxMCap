@@ -1,14 +1,30 @@
 ﻿using Newtonsoft.Json.Linq;
+using Serilog;
 using StxMCap.DataGrabber.Model;
 
 namespace StxMCap.DataGrabber.Factory
 {
     public class MarketDataFactory : IMarketDataFactory
     {
+        #region Private Data
+
+        private readonly ILogger _logger;
+
+        #endregion
+
         #region Public Methods
+
+        public MarketDataFactory(ILogger logger)
+        {
+            _logger = logger;
+
+            _logger.Information("MarketDataFactory: Instantiation successful.");
+        }
 
         public IMarketData GetMarketDataFromJson(string jsonContent, string symbol)
         {
+            _logger.Information($"MarketDataFactory: Constructing market data from json content for symbol: {symbol}");
+
             JObject jsonObject = JObject.Parse(jsonContent);
             JToken dataObject = jsonObject["context"]["dispatcher"]["stores"]["StreamDataStore"]["quoteData"][symbol];
 
