@@ -1,7 +1,7 @@
-﻿using Serilog;
-using StxMCap.DataGrabber.Wrapper;
+﻿using RedSpiderTech.YahooApi.DataGrabber.Core.Interface;
+using Serilog;
 
-namespace StxMCap.DataGrabber.Factory
+namespace RedSpiderTech.YahooApi.DataGrabber.Core.Implementation
 {
     public class WebClientWrapperFactory : IWebClientWrapperFactory
     {

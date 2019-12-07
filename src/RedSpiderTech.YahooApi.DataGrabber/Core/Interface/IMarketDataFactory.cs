@@ -1,6 +1,6 @@
-﻿using StxMCap.DataGrabber.Model;
+﻿using RedSpiderTech.YahooApi.DataGrabber.Model.Interface;
 
-namespace StxMCap.DataGrabber.Factory
+namespace RedSpiderTech.YahooApi.DataGrabber.Core.Interface
 {
     public interface IMarketDataFactory
     {

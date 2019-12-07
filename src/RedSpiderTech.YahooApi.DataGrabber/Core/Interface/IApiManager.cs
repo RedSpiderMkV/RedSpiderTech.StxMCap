@@ -1,4 +1,4 @@
-﻿namespace StxMCap.DataGrabber.ApiManagement
+﻿namespace RedSpiderTech.YahooApi.DataGrabber.Core.Interface
 {
     public interface IApiManager
     {

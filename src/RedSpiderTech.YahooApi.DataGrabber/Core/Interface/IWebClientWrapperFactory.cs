@@ -1,6 +1,4 @@
-﻿using StxMCap.DataGrabber.Wrapper;
-
-namespace StxMCap.DataGrabber.Factory
+﻿namespace RedSpiderTech.YahooApi.DataGrabber.Core.Interface
 {
     public interface IWebClientWrapperFactory
     {

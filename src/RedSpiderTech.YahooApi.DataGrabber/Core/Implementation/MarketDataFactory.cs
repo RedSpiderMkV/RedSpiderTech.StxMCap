@@ -1,8 +1,10 @@
 ﻿using Newtonsoft.Json.Linq;
+using RedSpiderTech.YahooApi.DataGrabber.Core.Interface;
+using RedSpiderTech.YahooApi.DataGrabber.Model.Implementation;
+using RedSpiderTech.YahooApi.DataGrabber.Model.Interface;
 using Serilog;
-using StxMCap.DataGrabber.Model;
 
-namespace StxMCap.DataGrabber.Factory
+namespace RedSpiderTech.YahooApi.DataGrabber.Core.Implementation
 {
     public class MarketDataFactory : IMarketDataFactory
     {

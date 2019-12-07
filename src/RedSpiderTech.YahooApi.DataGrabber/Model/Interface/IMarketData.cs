@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace StxMCap.DataGrabber.Model
+namespace RedSpiderTech.YahooApi.DataGrabber.Model.Interface
 {
     public interface IMarketData
     {

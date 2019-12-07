@@ -1,9 +1,8 @@
 ﻿using System;
+using RedSpiderTech.YahooApi.DataGrabber.Core.Interface;
 using Serilog;
-using StxMCap.DataGrabber.Factory;
-using StxMCap.DataGrabber.Wrapper;
 
-namespace StxMCap.DataGrabber.ApiManagement
+namespace RedSpiderTech.YahooApi.DataGrabber.Core.Implementation
 {
     public class ApiManager : IApiManager
     {

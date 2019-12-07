@@ -1,9 +1,8 @@
-﻿using Serilog;
-using StxMCap.DataGrabber.ApiManagement;
-using StxMCap.DataGrabber.Factory;
-using StxMCap.DataGrabber.Model;
+﻿using RedSpiderTech.YahooApi.DataGrabber.Core.Interface;
+using RedSpiderTech.YahooApi.DataGrabber.Model.Interface;
+using Serilog;
 
-namespace StxMCap.DataGrabber.Utilities
+namespace RedSpiderTech.YahooApi.DataGrabber.Core.Implementation
 {
     public class MarketDataRetriever : IMarketDataRetriever
     {

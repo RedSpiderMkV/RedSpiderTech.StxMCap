@@ -1,5 +1,5 @@
 ﻿using System;
-using StxMCap.DataGrabber.Model;
+using RedSpiderTech.YahooApi.DataGrabber.Model.Interface;
 
 namespace StxMCap.DataGrabber.FileManagement
 {
