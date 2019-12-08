@@ -14,10 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RedSpiderTech.YahooApi.DataGrabber\RedSpiderTech.YahooApi.DataGrabber.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <Reference Include="RedSpiderTech.YahooApi.DataGrabber">
+      <HintPath>..\..\Libs\netstandard2.0\RedSpiderTech.YahooApi.DataGrabber.dll</HintPath>
+    </Reference>
     <Reference Include="System.Configuration" />
   </ItemGroup>
 
