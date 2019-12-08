@@ -1,5 +1,5 @@
-﻿using System.Configuration;
-using System.IO;
+﻿using System.IO;
+using System.Configuration;
 
 namespace StxMCap.DataGrabber.Utilities
 {

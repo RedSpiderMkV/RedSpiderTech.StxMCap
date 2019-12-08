@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Autofac;
-using RedSpiderTech.YahooApi.DataGrabber;
-using RedSpiderTech.YahooApi.DataGrabber.Core.Interface;
-using RedSpiderTech.YahooApi.DataGrabber.Model.Interface;
 using Serilog;
 using StxMCap.DataGrabber.FileManagement;
+using StxMCap.DataGrabber.Model;
 using StxMCap.DataGrabber.Utilities;
+using YahooFinanceApi;
 
 namespace StxMCap.DataGrabber
 {
@@ -26,11 +25,13 @@ namespace StxMCap.DataGrabber
             _logger.Information("--------------------------------------");
 
             IInputFileParser inputFileParser = _container.Resolve<IInputFileParser>();
-            IMarketDataRetriever marketDataRetriever = _container.Resolve<IYahooMarketDataRetrieverBuilder>().GetMarketDataRetriever();
             IOutputDataWriter outputDataWriter = _container.Resolve<IOutputDataWriter>();
+            ISecurityDataRetriever securityDataRetriever = _container.Resolve<ISecurityDataRetriever>();
+            IMarketDataFactory marketDataFactory = _container.Resolve<IMarketDataFactory>();
 
             string[] symbols = inputFileParser.GetInputSymbols();
-            IEnumerable<IMarketData> marketDataCollection = symbols.Select(marketDataRetriever.GetMarketData);
+            IEnumerable<Security> securityDataCollection = securityDataRetriever.GetSecurityData(symbols);
+            IEnumerable<IMarketData> marketDataCollection = securityDataCollection.Select(marketDataFactory.GetMarketData);
             marketDataCollection.ToList().ForEach(outputDataWriter.AppendData);
 
             outputDataWriter.Dispose();
@@ -42,10 +43,11 @@ namespace StxMCap.DataGrabber
 
             builder.RegisterType<LogInitialiser>().As<ILogInitialiser>().SingleInstance();
             builder.Register(x => x.Resolve<ILogInitialiser>().GetLogger()).As<ILogger>().SingleInstance();
+            builder.RegisterType<SecurityDataRetriever>().As<ISecurityDataRetriever>().SingleInstance();
             builder.RegisterType<OutputDataWriter>().As<IOutputDataWriter>().SingleInstance();
             builder.RegisterType<AppConfigurationManager>().As<IAppConfigurationManager>();
             builder.RegisterType<InputFileParser>().As<IInputFileParser>();
-            builder.RegisterType<YahooMarketDataRetrieverBuilder>().As<IYahooMarketDataRetrieverBuilder>();
+            builder.RegisterType<MarketDataFactory>().As<IMarketDataFactory>();
 
             _container = builder.Build();
         }

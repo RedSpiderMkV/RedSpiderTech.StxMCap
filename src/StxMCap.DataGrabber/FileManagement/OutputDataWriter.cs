@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using RedSpiderTech.YahooApi.DataGrabber.Model.Interface;
 using Serilog;
+using StxMCap.DataGrabber.Model;
 using StxMCap.DataGrabber.Utilities;
 
 namespace StxMCap.DataGrabber.FileManagement
