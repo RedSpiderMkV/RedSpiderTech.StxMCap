@@ -1,6 +1,6 @@
-﻿using Serilog;
+﻿using RedSpiderTech.Securities.DataRetriever.Model;
+using Serilog;
 using StxMCap.DataGrabber.Model;
-using YahooFinanceApi;
 
 namespace StxMCap.DataGrabber.Utilities
 {
@@ -21,17 +21,17 @@ namespace StxMCap.DataGrabber.Utilities
             _logger.Information("MarketDataFactory: Instantiation successful.");
         }
 
-        public IMarketData GetMarketData(Security securityData)
+        public IMarketData GetMarketData(ISecurityData securityData)
         {
             _logger.Information($"MarketDataFactory: Generating market data for {securityData.Symbol}");
 
             var marketData = new MarketData(securityData.Symbol,
-                                            securityData.RegularMarketTime,
+                                            securityData.TimeStamp,
                                             securityData.LongName,
                                             securityData.ShortName,
-                                            securityData.Exchange,
-                                            securityData.MarketCap,
-                                            securityData.RegularMarketPrice);
+                                            securityData.ExchangeName,
+                                            securityData.MarketCapital,
+                                            securityData.CurrentPrice);
 
             return marketData;
         }

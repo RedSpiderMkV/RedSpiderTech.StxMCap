@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Autofac;
+using RedSpiderTech.Securities.DataRetriever;
+using RedSpiderTech.Securities.DataRetriever.Core;
+using RedSpiderTech.Securities.DataRetriever.Model;
 using Serilog;
 using StxMCap.DataGrabber.FileManagement;
 using StxMCap.DataGrabber.Model;
 using StxMCap.DataGrabber.Utilities;
-using YahooFinanceApi;
 
 namespace StxMCap.DataGrabber
 {
@@ -30,7 +32,7 @@ namespace StxMCap.DataGrabber
             IMarketDataFactory marketDataFactory = _container.Resolve<IMarketDataFactory>();
 
             string[] symbols = inputFileParser.GetInputSymbols();
-            IEnumerable<Security> securityDataCollection = securityDataRetriever.GetSecurityData(symbols);
+            IEnumerable<ISecurityData> securityDataCollection = securityDataRetriever.GetSecurityData(symbols);
             IEnumerable<IMarketData> marketDataCollection = securityDataCollection.Select(marketDataFactory.GetMarketData);
             marketDataCollection.ToList().ForEach(outputDataWriter.AppendData);
 
@@ -43,8 +45,9 @@ namespace StxMCap.DataGrabber
 
             builder.RegisterType<LogInitialiser>().As<ILogInitialiser>().SingleInstance();
             builder.Register(x => x.Resolve<ILogInitialiser>().GetLogger()).As<ILogger>().SingleInstance();
-            builder.RegisterType<SecurityDataRetriever>().As<ISecurityDataRetriever>().SingleInstance();
+            builder.RegisterType<SecurityDataRetrieverManager>().As<ISecurityDataRetrieverManager>().SingleInstance();
             builder.RegisterType<OutputDataWriter>().As<IOutputDataWriter>().SingleInstance();
+            builder.Register(x => x.Resolve<ISecurityDataRetrieverManager>().GetSecurityDataRetriever()).As<ISecurityDataRetriever>();
             builder.RegisterType<AppConfigurationManager>().As<IAppConfigurationManager>();
             builder.RegisterType<InputFileParser>().As<IInputFileParser>();
             builder.RegisterType<MarketDataFactory>().As<IMarketDataFactory>();

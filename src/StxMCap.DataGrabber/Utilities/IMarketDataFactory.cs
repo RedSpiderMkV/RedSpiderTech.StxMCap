@@ -1,10 +1,10 @@
-﻿using StxMCap.DataGrabber.Model;
-using YahooFinanceApi;
+﻿using RedSpiderTech.Securities.DataRetriever.Model;
+using StxMCap.DataGrabber.Model;
 
 namespace StxMCap.DataGrabber.Utilities
 {
     public interface IMarketDataFactory
     {
-        IMarketData GetMarketData(Security securityData);
+        IMarketData GetMarketData(ISecurityData securityData);
     }
 }
